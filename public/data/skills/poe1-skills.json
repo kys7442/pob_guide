@@ -1,0 +1,214 @@
+{
+  "version": "3.25",
+  "season": "poe1-settlers",
+  "skills": [
+    {
+      "id": "Cyclone",
+      "nameEn": "Cyclone",
+      "nameKr": "사이클론",
+      "tags": ["attack", "melee", "aoe", "channelling"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Boneshatter",
+      "nameEn": "Boneshatter",
+      "nameKr": "본샤터",
+      "tags": ["attack", "melee", "aoe", "physical"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "BladeFlurry",
+      "nameEn": "Blade Flurry",
+      "nameKr": "칼날 연타",
+      "tags": ["attack", "melee", "aoe", "channelling"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "LightningStrike",
+      "nameEn": "Lightning Strike",
+      "nameKr": "번개 강타",
+      "tags": ["attack", "melee", "projectile", "lightning"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "FlickerStrike",
+      "nameEn": "Flicker Strike",
+      "nameKr": "플리커 강타",
+      "tags": ["attack", "melee", "movement"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Lacerate",
+      "nameEn": "Lacerate",
+      "nameKr": "열상",
+      "tags": ["attack", "melee", "aoe", "physical"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "TornadoShot",
+      "nameEn": "Tornado Shot",
+      "nameKr": "토네이도 샷",
+      "tags": ["attack", "projectile", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "RainOfArrows",
+      "nameEn": "Rain of Arrows",
+      "nameKr": "화살비",
+      "tags": ["attack", "projectile", "aoe", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Barrage",
+      "nameEn": "Barrage",
+      "nameKr": "집중 사격",
+      "tags": ["attack", "projectile", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "ExplosiveArrow",
+      "nameEn": "Explosive Arrow",
+      "nameKr": "폭발 화살",
+      "tags": ["attack", "projectile", "aoe", "fire", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "ToxicRain",
+      "nameEn": "Toxic Rain",
+      "nameKr": "독성 비",
+      "tags": ["attack", "projectile", "aoe", "chaos", "duration", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "ScourgeArrow",
+      "nameEn": "Scourge Arrow",
+      "nameKr": "재앙 화살",
+      "tags": ["attack", "projectile", "channelling", "chaos", "bow"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Arc",
+      "nameEn": "Arc",
+      "nameKr": "아크",
+      "tags": ["spell", "chaining", "lightning", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "BallLightning",
+      "nameEn": "Ball Lightning",
+      "nameKr": "구체 번개",
+      "tags": ["spell", "projectile", "lightning", "aoe"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Spark",
+      "nameEn": "Spark",
+      "nameKr": "스파크",
+      "tags": ["spell", "projectile", "lightning", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "StormBrand",
+      "nameEn": "Storm Brand",
+      "nameKr": "폭풍 낙인",
+      "tags": ["spell", "lightning", "chaining", "brand", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Fireball",
+      "nameEn": "Fireball",
+      "nameKr": "화염구",
+      "tags": ["spell", "projectile", "fire", "aoe"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Vortex",
+      "nameEn": "Vortex",
+      "nameKr": "소용돌이",
+      "tags": ["spell", "aoe", "cold", "duration", "nova"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "BladeVortex",
+      "nameEn": "Blade Vortex",
+      "nameKr": "칼날 소용돌이",
+      "tags": ["spell", "aoe", "physical", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "EssenceDrain",
+      "nameEn": "Essence Drain",
+      "nameKr": "정수 흡수",
+      "tags": ["spell", "projectile", "chaos", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Blight",
+      "nameEn": "Blight",
+      "nameKr": "역병",
+      "tags": ["spell", "channelling", "chaos", "duration", "aoe"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "RaiseZombie",
+      "nameEn": "Raise Zombie",
+      "nameKr": "좀비 소환",
+      "tags": ["spell", "minion", "physical"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "RaiseSpectre",
+      "nameEn": "Raise Spectre",
+      "nameKr": "유령 소환",
+      "tags": ["spell", "minion"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "SummonSkeletons",
+      "nameEn": "Summon Skeletons",
+      "nameKr": "해골 소환",
+      "tags": ["spell", "minion", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "RighteousFire",
+      "nameEn": "Righteous Fire",
+      "nameKr": "의로운 불꽃",
+      "tags": ["spell", "aoe", "fire", "duration"],
+      "type": "active",
+      "isVaal": false
+    },
+    {
+      "id": "Earthquake",
+      "nameEn": "Earthquake",
+      "nameKr": "지진",
+      "tags": ["attack", "melee", "aoe", "physical", "duration"],
+      "type": "active",
+      "isVaal": false
+    }
+  ]
+}

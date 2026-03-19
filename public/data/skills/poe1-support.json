@@ -1,0 +1,323 @@
+{
+  "version": "3.25",
+  "skills": [
+    {
+      "id": "Multistrike",
+      "nameEn": "Multistrike Support",
+      "nameKr": "다중 강타",
+      "tags": ["attack", "melee"],
+      "type": "support",
+      "letter": "A"
+    },
+    {
+      "id": "SpellEcho",
+      "nameEn": "Spell Echo Support",
+      "nameKr": "주문 메아리",
+      "tags": ["spell"],
+      "type": "support",
+      "letter": "B"
+    },
+    {
+      "id": "ConcentratedEffect",
+      "nameEn": "Concentrated Effect Support",
+      "nameKr": "집중 효과",
+      "tags": ["aoe"],
+      "type": "support",
+      "letter": "C"
+    },
+    {
+      "id": "AddedLightningDamage",
+      "nameEn": "Added Lightning Damage Support",
+      "nameKr": "번개 피해 추가",
+      "tags": ["attack", "spell", "lightning"],
+      "type": "support",
+      "letter": "D"
+    },
+    {
+      "id": "AddedColdDamage",
+      "nameEn": "Added Cold Damage Support",
+      "nameKr": "냉기 피해 추가",
+      "tags": ["attack", "spell", "cold"],
+      "type": "support",
+      "letter": "E"
+    },
+    {
+      "id": "AddedFireDamage",
+      "nameEn": "Added Fire Damage Support",
+      "nameKr": "화염 피해 추가",
+      "tags": ["attack", "spell", "fire"],
+      "type": "support",
+      "letter": "F"
+    },
+    {
+      "id": "ElementalFocus",
+      "nameEn": "Elemental Focus Support",
+      "nameKr": "원소 집중",
+      "tags": ["attack", "spell"],
+      "type": "support",
+      "letter": "G"
+    },
+    {
+      "id": "Brutality",
+      "nameEn": "Brutality Support",
+      "nameKr": "야만성",
+      "tags": ["attack", "physical"],
+      "type": "support",
+      "letter": "H"
+    },
+    {
+      "id": "Impale",
+      "nameEn": "Impale Support",
+      "nameKr": "관통",
+      "tags": ["attack", "physical"],
+      "type": "support",
+      "letter": "I"
+    },
+    {
+      "id": "FasterAttacks",
+      "nameEn": "Faster Attacks Support",
+      "nameKr": "공격 속도 증가",
+      "tags": ["attack"],
+      "type": "support",
+      "letter": "J"
+    },
+    {
+      "id": "MeleePhysicalDamage",
+      "nameEn": "Melee Physical Damage Support",
+      "nameKr": "근접 물리 피해",
+      "tags": ["attack", "melee", "physical"],
+      "type": "support",
+      "letter": "K"
+    },
+    {
+      "id": "IncreasedAreaOfEffect",
+      "nameEn": "Increased Area of Effect Support",
+      "nameKr": "범위 증가",
+      "tags": ["aoe"],
+      "type": "support",
+      "letter": "L"
+    },
+    {
+      "id": "Empower",
+      "nameEn": "Empower Support",
+      "nameKr": "강화",
+      "tags": [],
+      "type": "support",
+      "letter": "+"
+    },
+    {
+      "id": "Enhance",
+      "nameEn": "Enhance Support",
+      "nameKr": "향상",
+      "tags": [],
+      "type": "support",
+      "letter": "+"
+    },
+    {
+      "id": "Enlighten",
+      "nameEn": "Enlighten Support",
+      "nameKr": "계몽",
+      "tags": [],
+      "type": "support",
+      "letter": "+"
+    },
+    {
+      "id": "GreaterMultipleProjectiles",
+      "nameEn": "Greater Multiple Projectiles Support",
+      "nameKr": "다중 투사체",
+      "tags": ["attack", "spell", "projectile"],
+      "type": "support",
+      "letter": "M"
+    },
+    {
+      "id": "Fork",
+      "nameEn": "Fork Support",
+      "nameKr": "분기",
+      "tags": ["attack", "spell", "projectile"],
+      "type": "support",
+      "letter": "N"
+    },
+    {
+      "id": "Chain",
+      "nameEn": "Chain Support",
+      "nameKr": "연쇄",
+      "tags": ["attack", "spell", "projectile", "chaining"],
+      "type": "support",
+      "letter": "O"
+    },
+    {
+      "id": "Pierce",
+      "nameEn": "Pierce Support",
+      "nameKr": "관통 사격",
+      "tags": ["attack", "projectile"],
+      "type": "support",
+      "letter": "P"
+    },
+    {
+      "id": "Hypothermia",
+      "nameEn": "Hypothermia Support",
+      "nameKr": "저체온증",
+      "tags": ["attack", "spell", "cold"],
+      "type": "support",
+      "letter": "Q"
+    },
+    {
+      "id": "IceBite",
+      "nameEn": "Ice Bite Support",
+      "nameKr": "얼음 물기",
+      "tags": ["attack", "cold"],
+      "type": "support",
+      "letter": "R"
+    },
+    {
+      "id": "ColdPenetration",
+      "nameEn": "Cold Penetration Support",
+      "nameKr": "냉기 관통",
+      "tags": ["attack", "spell", "cold"],
+      "type": "support",
+      "letter": "S"
+    },
+    {
+      "id": "FirePenetration",
+      "nameEn": "Fire Penetration Support",
+      "nameKr": "화염 관통",
+      "tags": ["attack", "spell", "fire"],
+      "type": "support",
+      "letter": "T"
+    },
+    {
+      "id": "LightningPenetration",
+      "nameEn": "Lightning Penetration Support",
+      "nameKr": "번개 관통",
+      "tags": ["attack", "spell", "lightning"],
+      "type": "support",
+      "letter": "U"
+    },
+    {
+      "id": "VoidManipulation",
+      "nameEn": "Void Manipulation Support",
+      "nameKr": "공허 조작",
+      "tags": ["attack", "spell", "chaos"],
+      "type": "support",
+      "letter": "V"
+    },
+    {
+      "id": "SwiftAffliction",
+      "nameEn": "Swift Affliction Support",
+      "nameKr": "빠른 고통",
+      "tags": ["attack", "spell", "duration"],
+      "type": "support",
+      "letter": "W"
+    },
+    {
+      "id": "Efficacy",
+      "nameEn": "Efficacy Support",
+      "nameKr": "효능",
+      "tags": ["spell", "duration"],
+      "type": "support",
+      "letter": "X"
+    },
+    {
+      "id": "Unleash",
+      "nameEn": "Unleash Support",
+      "nameKr": "해방",
+      "tags": ["spell"],
+      "type": "support",
+      "letter": "Y"
+    },
+    {
+      "id": "ArcaneSurge",
+      "nameEn": "Arcane Surge Support",
+      "nameKr": "신비로운 급증",
+      "tags": ["spell"],
+      "type": "support",
+      "letter": "Z"
+    },
+    {
+      "id": "CastWhenDamageTaken",
+      "nameEn": "Cast when Damage Taken Support",
+      "nameKr": "피해 시 시전",
+      "tags": ["spell", "trigger"],
+      "type": "support",
+      "letter": "T"
+    },
+    {
+      "id": "CullingStrike",
+      "nameEn": "Culling Strike Support",
+      "nameKr": "처형 강타",
+      "tags": ["attack", "spell"],
+      "type": "support",
+      "letter": "C"
+    },
+    {
+      "id": "Combustion",
+      "nameEn": "Combustion Support",
+      "nameKr": "연소",
+      "tags": ["attack", "spell", "fire"],
+      "type": "support",
+      "letter": "C"
+    },
+    {
+      "id": "IgniteProliferation",
+      "nameEn": "Ignite Proliferation Support",
+      "nameKr": "점화 확산",
+      "tags": ["attack", "spell", "fire"],
+      "type": "support",
+      "letter": "I"
+    },
+    {
+      "id": "AwakenedBrutality",
+      "nameEn": "Awakened Brutality Support",
+      "nameKr": "각성된 야만성",
+      "tags": ["attack", "physical"],
+      "type": "support",
+      "letter": "H",
+      "isAwakened": true
+    },
+    {
+      "id": "AwakenedAddedColdDamage",
+      "nameEn": "Awakened Added Cold Damage Support",
+      "nameKr": "각성된 냉기 피해 추가",
+      "tags": ["attack", "spell", "cold"],
+      "type": "support",
+      "letter": "E",
+      "isAwakened": true
+    },
+    {
+      "id": "AwakenedAddedFireDamage",
+      "nameEn": "Awakened Added Fire Damage Support",
+      "nameKr": "각성된 화염 피해 추가",
+      "tags": ["attack", "spell", "fire"],
+      "type": "support",
+      "letter": "F",
+      "isAwakened": true
+    },
+    {
+      "id": "AwakenedAddedLightningDamage",
+      "nameEn": "Awakened Added Lightning Damage Support",
+      "nameKr": "각성된 번개 피해 추가",
+      "tags": ["attack", "spell", "lightning"],
+      "type": "support",
+      "letter": "D",
+      "isAwakened": true
+    },
+    {
+      "id": "AwakenedSpellEcho",
+      "nameEn": "Awakened Spell Echo Support",
+      "nameKr": "각성된 주문 메아리",
+      "tags": ["spell"],
+      "type": "support",
+      "letter": "B",
+      "isAwakened": true
+    },
+    {
+      "id": "AwakenedElementalFocus",
+      "nameEn": "Awakened Elemental Focus Support",
+      "nameKr": "각성된 원소 집중",
+      "tags": ["attack", "spell"],
+      "type": "support",
+      "letter": "G",
+      "isAwakened": true
+    }
+  ]
+}

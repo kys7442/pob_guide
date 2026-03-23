@@ -255,7 +255,9 @@ function parseItemText(text: string): Item {
   let name = "";
   let baseType = "";
   let icon: string | undefined;
+  let corrupted = false;
   const implicitMods: string[] = [];
+  const enchantMods: string[] = [];
   const explicitMods: string[] = [];
 
   let nameLines: string[] = [];
@@ -281,7 +283,6 @@ function parseItemText(text: string): Item {
     /^Requires Dex/,
     /^Requires Int/,
     /^--------/,
-    /^Corrupted$/,
     /^Mirrored$/,
     /^Synthesised Item$/,
     /^\{.*\}$/,  // {mutated} 등 태그
@@ -303,6 +304,12 @@ function parseItemText(text: string): Item {
       continue;
     }
 
+    // 타락 감지
+    if (line === "Corrupted") {
+      corrupted = true;
+      continue;
+    }
+
     if (line.startsWith("Implicits: ")) {
       implicitCount = parseInt(line.replace("Implicits: ", "").trim(), 10);
       foundImplicits = true;
@@ -313,17 +320,23 @@ function parseItemText(text: string): Item {
     // 메타데이터 스킵
     if (META_PATTERNS.some((p) => p.test(line))) continue;
 
-    // {mutated} 같은 prefix 제거
-    const cleanLine = line.replace(/^\{[^}]+\}/, "").trim();
+    // {enchant}/{crafted}/{fractured} 같은 prefix 처리
+    const prefixMatch = line.match(/^\{([^}]+)\}(.*)$/);
+    const modTag = prefixMatch ? prefixMatch[1].toLowerCase() : "";
+    const cleanLine = prefixMatch ? prefixMatch[2].trim() : line.trim();
     if (!cleanLine) continue;
 
     if (!foundImplicits) {
       // Implicits: N 줄 전 → 이름/베이스 타입
       nameLines.push(cleanLine);
     } else {
-      // Implicits 이후
       if (modsCollected < implicitCount) {
-        implicitMods.push(cleanLine);
+        // 인챈트 구분 ({enchant} 태그)
+        if (modTag === "enchant") {
+          enchantMods.push(cleanLine);
+        } else {
+          implicitMods.push(cleanLine);
+        }
         modsCollected++;
       } else {
         explicitMods.push(cleanLine);
@@ -344,7 +357,9 @@ function parseItemText(text: string): Item {
     rarity,
     baseType: baseType || undefined,
     icon,
+    corrupted,
     implicitMods: implicitMods.filter(m => m.length > 0),
+    enchantMods: enchantMods.filter(m => m.length > 0),
     explicitMods: explicitMods.filter(m => m.length > 0 && !m.startsWith("ModRange")),
     rawText: text,
   };

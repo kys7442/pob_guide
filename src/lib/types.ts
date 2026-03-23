@@ -36,6 +36,8 @@ export interface Item {
   requirements?: ItemProperty[];
   implicitMods?: string[];
   explicitMods?: string[];
+  enchantMods?: string[];
+  corrupted?: boolean;
   rawText?: string;
 }
 

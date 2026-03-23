@@ -1,5 +1,8 @@
+"use client";
+
 import type { ParsedBuild, SkillSlot } from "@/lib/types";
 import { translateSkillGem, translateSlot } from "@/lib/translations";
+import { useKoreanNames } from "@/lib/use-korean-names";
 import { clsx } from "clsx";
 
 interface SkillGemsProps {
@@ -8,6 +11,7 @@ interface SkillGemsProps {
 
 export default function SkillGems({ build }: SkillGemsProps) {
   const { skills, meta } = build;
+  const lookupKr = useKoreanNames(meta.gameVersion);
 
   if (skills.length === 0) {
     return (
@@ -21,7 +25,7 @@ export default function SkillGems({ build }: SkillGemsProps) {
   return (
     <div className="space-y-3">
       {skills.map((slot, idx) => (
-        <SkillSlotCard key={idx} slot={slot} gameVersion={meta.gameVersion} />
+        <SkillSlotCard key={idx} slot={slot} gameVersion={meta.gameVersion} lookupKr={lookupKr} />
       ))}
     </div>
   );
@@ -30,12 +34,16 @@ export default function SkillGems({ build }: SkillGemsProps) {
 function SkillSlotCard({
   slot,
   gameVersion,
+  lookupKr,
 }: {
   slot: SkillSlot;
   gameVersion: "poe1" | "poe2";
+  lookupKr: (name: string) => string | null;
 }) {
   const slotLabel = translateSlot(slot.slotId || slot.label || "");
-  const label = slotLabel !== (slot.slotId || slot.label || "") ? slotLabel : (slot.label || slot.slotId || "스킬 슬롯");
+  const label = slotLabel !== (slot.slotId || slot.label || "")
+    ? slotLabel
+    : (slot.label || slot.slotId || "스킬 슬롯");
 
   return (
     <div
@@ -69,6 +77,7 @@ function SkillSlotCard({
             enabled={gem.enabled !== false}
             gameVersion={gameVersion}
             color={gem.color as GemColorKey | undefined}
+            lookupKr={lookupKr}
           />
         ))}
       </div>
@@ -94,6 +103,7 @@ function GemBadge({
   enabled,
   gameVersion,
   color,
+  lookupKr,
 }: {
   name: string;
   level?: number;
@@ -102,8 +112,10 @@ function GemBadge({
   enabled: boolean;
   gameVersion: "poe1" | "poe2";
   color?: GemColorKey;
+  lookupKr: (name: string) => string | null;
 }) {
-  const krName = translateSkillGem(name, gameVersion);
+  // 동적 API 우선 → 정적 사전 폴백
+  const krName = lookupKr(name) ?? translateSkillGem(name, gameVersion);
   const hasTranslation = krName !== name;
   const colorKey: GemColorKey = color || (isSupport ? "support" : "red");
   const style = GEM_STYLES[colorKey];

@@ -1,229 +1,189 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, Upload, Link } from "lucide-react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import type { TickerItem } from "@/app/api/currency-rates/route";
 
-export default function HomePage() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"pob" | "ninja">("pob");
-  const [pobCode, setPobCode] = useState("");
-  const [ninjaUrl, setNinjaUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [guideOpen, setGuideOpen] = useState(false);
+interface MarketData {
+  league: string;
+  currencies: TickerItem[];
+  uniqueItems: TickerItem[];
+  scarabs: TickerItem[];
+  leagueItems: TickerItem[];
+  skillGems: TickerItem[];
+}
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+// 모듈 레벨 캐시 — 같은 세션에서 페이지 재방문 시 API 재호출 없음
+const CLIENT_TTL = 10 * 60 * 1000; // 10분
+let _cached: { data: MarketData; at: number } | null = null;
 
-    try {
-      if (activeTab === "pob") {
-        if (!pobCode.trim()) {
-          setError("PoB 코드를 입력해주세요.");
-          return;
-        }
-        // PoB 코드를 URL 파라미터로 전달 (base64url이므로 안전)
-        router.push(`/build?code=${encodeURIComponent(pobCode.trim())}&source=pob`);
-      } else {
-        if (!ninjaUrl.trim()) {
-          setError("poe.ninja URL을 입력해주세요.");
-          return;
-        }
-        router.push(`/build?url=${encodeURIComponent(ninjaUrl.trim())}&source=ninja`);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+const TABS = [
+  { key: "currencies",  label: "커런시" },
+  { key: "uniqueItems", label: "고유 아이템" },
+  { key: "scarabs",     label: "갑충석" },
+  { key: "leagueItems", label: "리그 아이템" },
+  { key: "skillGems",   label: "스킬 젬" },
+] as const;
+
+type TabKey = typeof TABS[number]["key"];
+
+function formatChaos(value: number): string {
+  if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+  if (value >= 100) return value.toFixed(0);
+  return value.toFixed(1);
+}
+
+function formatDiv(value: number): string {
+  if (value >= 100) return value.toFixed(0);
+  if (value >= 10) return value.toFixed(1);
+  return value.toFixed(2);
+}
+
+function RankRow({ rank, item, divRate }: { rank: number; item: TickerItem; divRate: number | null }) {
+  const divValue = divRate && divRate > 0 ? item.chaosValue / divRate : null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* 히어로 섹션 */}
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-black text-white mb-2">
-          <span className="text-amber-400">PoE</span> 빌드 가이드
-        </h1>
-        <p className="text-gray-400">
-          Path of Building 코드 또는 poe.ninja URL을 붙여넣으면
-          <br />
-          빌드를 <strong className="text-white">한국어</strong>로 분석해드립니다
-        </p>
-        <div className="flex justify-center gap-3 mt-3">
-          <span className="px-2 py-1 rounded text-xs bg-amber-900/40 border border-amber-700 text-amber-300">
-            PoE 1 지원
-          </span>
-          <span className="px-2 py-1 rounded text-xs bg-purple-900/40 border border-purple-700 text-purple-300">
-            PoE 2 지원
-          </span>
-        </div>
-      </div>
+    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-800/60 transition-colors rounded-lg">
+      {/* 순위 */}
+      <span className={`w-6 text-center text-xs font-bold flex-shrink-0 ${rank <= 3 ? "text-amber-400" : "text-gray-600"}`}>
+        {rank}
+      </span>
 
-      {/* 입력 폼 */}
-      <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
-        {/* 탭 */}
-        <div className="flex border-b border-gray-700">
-          <TabButton
-            active={activeTab === "pob"}
-            onClick={() => setActiveTab("pob")}
-            icon={<Upload className="w-4 h-4" />}
-            label="PoB 코드 붙여넣기"
-          />
-          <TabButton
-            active={activeTab === "ninja"}
-            onClick={() => setActiveTab("ninja")}
-            icon={<Link className="w-4 h-4" />}
-            label="poe.ninja URL"
-          />
-        </div>
-
-        {/* 폼 내용 */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {activeTab === "pob" ? (
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Path of Building 내보내기 코드
-              </label>
-              <textarea
-                value={pobCode}
-                onChange={(e) => setPobCode(e.target.value)}
-                placeholder="eNrtWmtz2jgU/Ss7+7Ud2xhj6H...  또는  https://pobb.in/uFe_URAUgtgI"
-                className="w-full h-36 bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 font-mono resize-none focus:outline-none focus:border-amber-500 transition-colors"
-                spellCheck={false}
-              />
-              <p className="text-xs text-gray-600 mt-1">
-                PoB 코드 붙여넣기 또는{" "}
-                <span className="text-amber-600/80">pobb.in URL</span> 입력 가능
-              </p>
-            </div>
-          ) : (
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                poe.ninja 캐릭터 URL
-              </label>
-              <input
-                type="url"
-                value={ninjaUrl}
-                onChange={(e) => setNinjaUrl(e.target.value)}
-                placeholder="https://poe.ninja/poe1/builds/Settlers/character/계정명/캐릭터명"
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
-              />
-              <p className="text-xs text-gray-600 mt-1">
-                poe.ninja에서 캐릭터 페이지 URL을 복사해 붙여넣으세요
-              </p>
-              <p className="text-xs text-yellow-600/80 mt-1">
-                ⚠️ 캐릭터가 공개 설정되어 있어야 합니다
-              </p>
-            </div>
-          )}
-
-          {error && (
-            <div className="px-4 py-3 rounded-lg bg-red-950/50 border border-red-800 text-red-300 text-sm">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:bg-gray-700 disabled:text-gray-500 text-black font-bold text-sm transition-colors"
-          >
-            {loading ? "분석 중..." : "빌드 분석하기"}
-          </button>
-        </form>
-      </div>
-
-      {/* 사용 방법 안내 (아코디언) */}
-      <div className="mt-4 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
-        <button
-          onClick={() => setGuideOpen(!guideOpen)}
-          className="w-full flex items-center justify-between px-5 py-4 text-sm text-gray-300 hover:text-white transition-colors"
-        >
-          <span className="font-medium">사용 방법 안내</span>
-          {guideOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        {guideOpen && (
-          <div className="px-5 pb-5 space-y-4 border-t border-gray-800 pt-4">
-            <GuideSection
-              title="PoB 코드 가져오기"
-              steps={[
-                "Path of Building Community(PoBC)에서 빌드를 불러옵니다",
-                '상단 메뉴 "공유" → "빌드 코드 복사"를 클릭합니다',
-                "복사한 코드를 위 텍스트 상자에 붙여넣고 분석합니다",
-              ]}
-            />
-            <GuideSection
-              title="pobb.in URL로 불러오기"
-              steps={[
-                "pobb.in에 공유된 빌드 링크를 복사합니다",
-                "예: https://pobb.in/uFe_URAUgtgI",
-                "PoB 코드 입력란에 URL을 붙여넣고 분석합니다",
-              ]}
-            />
-            <GuideSection
-              title="poe.ninja URL 가져오기"
-              steps={[
-                "poe.ninja 사이트에서 원하는 캐릭터 페이지를 엽니다",
-                "주소창의 URL을 복사합니다",
-                "URL 탭에 붙여넣고 분석합니다 (캐릭터 공개 필요)",
-              ]}
-            />
-            <div className="bg-gray-800/50 rounded-lg p-3">
-              <p className="text-xs text-amber-400 font-medium mb-1">분석 결과에서 볼 수 있는 것</p>
-              <ul className="text-xs text-gray-400 space-y-0.5">
-                <li>• 클래스, 레벨, 어센던시 정보</li>
-                <li>• 생명력/DPS/저항 등 핵심 스탯</li>
-                <li>• 스킬 젬 구성 (한국어 번역)</li>
-                <li>• 장비 세팅 및 아이템 스탯</li>
-                <li>• 패시브 트리 키스톤 요약</li>
-              </ul>
-            </div>
+      {/* 아이콘 */}
+      <div className="w-8 h-8 flex-shrink-0 relative">
+        {item.icon ? (
+          <Image src={item.icon} alt={item.name} fill sizes="32px" className="object-contain" unoptimized />
+        ) : (
+          <div className="w-full h-full rounded bg-gray-700 flex items-center justify-center">
+            <span className="text-[9px] text-gray-400">₡</span>
           </div>
         )}
+      </div>
+
+      {/* 이름 */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-gray-200 truncate">{item.name}</p>
+        {item.baseType && (
+          <p className="text-[10px] text-gray-600 truncate">{item.baseType}</p>
+        )}
+      </div>
+
+      {/* 가격 — 카오스 / 디바인 나란히 */}
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="text-right">
+          <span className="text-xs text-gray-600 block mb-0.5">카오스</span>
+          <span className="text-sm font-bold text-amber-400">
+            {formatChaos(item.chaosValue)}
+            <span className="text-[10px] text-gray-500 ml-0.5 font-normal">c</span>
+          </span>
+        </div>
+        <div className="text-right">
+          <span className="text-xs text-gray-600 block mb-0.5">디바인</span>
+          {divValue !== null ? (
+            <span className="text-sm font-bold text-sky-400">
+              {formatDiv(divValue)}
+              <span className="text-[10px] text-sky-600 ml-0.5 font-normal">div</span>
+            </span>
+          ) : (
+            <span className="text-sm text-gray-700">-</span>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-function TabButton({
-  active,
-  onClick,
-  icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
-        active
-          ? "text-amber-400 border-b-2 border-amber-400 bg-amber-900/10"
-          : "text-gray-500 hover:text-gray-300"
-      }`}
-    >
-      {icon}
-      {label}
-    </button>
-  );
-}
+export default function HomePage() {
+  const [data, setData] = useState<MarketData | null>(_cached?.data ?? null);
+  const [loading, setLoading] = useState(_cached === null);
+  const [activeTab, setActiveTab] = useState<TabKey>("currencies");
 
-function GuideSection({ title, steps }: { title: string; steps: string[] }) {
+  useEffect(() => {
+    // 캐시가 유효하면 API 재호출 없음
+    if (_cached && Date.now() - _cached.at < CLIENT_TTL) return;
+    fetch("/api/currency-rates")
+      .then(r => r.json())
+      .then((d: MarketData) => {
+        _cached = { data: d, at: Date.now() };
+        setData(d);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const items: TickerItem[] = data ? (data[activeTab] ?? []) : [];
+
+  // currencies 배열에서 직접 Divine Orb 추출 — 별도 API 필드 불필요
+  const divRate: number | null =
+    data?.currencies.find(c => c.name === "Divine Orb")?.chaosValue ?? null;
+
   return (
-    <div>
-      <p className="text-sm font-medium text-gray-300 mb-1">{title}</p>
-      <ol className="text-xs text-gray-500 space-y-0.5">
-        {steps.map((step, i) => (
-          <li key={i}>
-            {i + 1}. {step}
-          </li>
+    <div className="max-w-2xl mx-auto">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-xl font-black text-white">
+            <span className="text-amber-400">PoE</span> 시세 현황
+          </h1>
+          {data && (
+            <p className="text-xs text-gray-500 mt-0.5">
+              {data.league} 리그
+              {divRate && (
+                <span className="ml-2 text-sky-500">1 div = {formatChaos(divRate)}c</span>
+              )}
+            </p>
+          )}
+        </div>
+        {loading && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            로딩 중...
+          </div>
+        )}
+      </div>
+
+      {/* 탭 */}
+      <div className="flex bg-gray-900 border border-gray-700 rounded-xl overflow-hidden mb-4">
+        {TABS.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${activeTab === tab.key ? "bg-amber-600 text-black" : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"}`}
+          >
+            {tab.label}
+          </button>
         ))}
-      </ol>
+      </div>
+
+      {/* 리스트 */}
+      <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
+        {/* 컬럼 헤더 */}
+        <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-800">
+          <span className="w-6 text-center text-[10px] text-gray-600">#</span>
+          <span className="w-8 flex-shrink-0" />
+          <span className="flex-1 text-[10px] text-gray-600">아이템</span>
+          <div className="flex gap-3 flex-shrink-0">
+            <span className="w-14 text-right text-[10px] text-amber-600/70">카오스</span>
+            <span className="w-14 text-right text-[10px] text-sky-600/70">디바인</span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-16 text-center text-gray-500 text-sm">데이터 불러오는 중...</div>
+        ) : items.length === 0 ? (
+          <div className="py-16 text-center text-gray-500 text-sm">데이터가 없습니다</div>
+        ) : (
+          <div className="py-1">
+            {items.map((item, i) => (
+              <RankRow key={`${item.name}-${i}`} rank={i + 1} item={item} divRate={divRate} />
+            ))}
+          </div>
+        )}
+
+        <div className="px-4 py-2 border-t border-gray-800 text-[10px] text-gray-700 text-right">
+          출처: poe.ninja · 10분 캐시
+        </div>
+      </div>
     </div>
   );
 }

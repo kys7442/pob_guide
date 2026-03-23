@@ -28,17 +28,22 @@ export default function RootLayout({
         <Providers>
           <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-              <a href="/" className="flex items-center gap-2 group">
+              <a href="/" className="flex items-center gap-2 group flex-shrink-0">
                 <div className="w-8 h-8 rounded bg-amber-600 flex items-center justify-center text-black font-black text-sm group-hover:bg-amber-500 transition-colors">
                   PoE
                 </div>
-                <span className="font-bold text-amber-400 group-hover:text-amber-300 transition-colors">
+                <span className="font-bold text-amber-400 group-hover:text-amber-300 transition-colors hidden sm:inline">
                   빌드 가이드
                 </span>
               </a>
-              <span className="text-gray-600 text-sm hidden sm:inline">
-                — Path of Exile 한국어 빌드 분석기
-              </span>
+              <nav className="flex items-center gap-0.5 ml-3">
+                <a href="/" className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 transition-colors whitespace-nowrap">
+                  시세
+                </a>
+                <a href="/pob" className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 transition-colors whitespace-nowrap">
+                  빌드 분석
+                </a>
+              </nav>
               <div className="ml-auto">
                 <SeasonSelector />
               </div>

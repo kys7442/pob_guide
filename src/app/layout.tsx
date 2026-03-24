@@ -3,6 +3,8 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import SeasonSelector from "@/components/SeasonSelector";
 import AdSense from "@/components/AdSense";
+import SpeculationRules from "@/components/SpeculationRules";
+import BfcacheOptimizer from "@/components/BfcacheOptimizer";
 
 export const metadata: Metadata = {
   title: "PoE 빌드 가이드 - Path of Exile 한국어 빌드 분석",
@@ -23,8 +25,10 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3568835154047233"
           crossOrigin="anonymous"
         />
+        <SpeculationRules />
       </head>
       <body className="min-h-screen bg-gray-950 text-gray-100 antialiased">
+        <BfcacheOptimizer />
         <Providers>
           <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
             <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">

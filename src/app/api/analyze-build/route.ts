@@ -102,6 +102,7 @@ ${buildSummary}
           maxOutputTokens: 1024,
         },
       }),
+      signal: AbortSignal.timeout(15000),
     }
   );
 

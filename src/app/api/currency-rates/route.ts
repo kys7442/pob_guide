@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 const cache = new Map<string, { data: unknown; fetchedAt: number }>();
 const CACHE_TTL = 10 * 60 * 1000; // 10분
+const CACHE_MAX_SIZE = 30;
+
+function cacheSet(key: string, data: unknown) {
+  if (cache.size >= CACHE_MAX_SIZE) {
+    // 가장 오래된 항목 삭제
+    const oldest = [...cache.entries()].sort((a, b) => a[1].fetchedAt - b[1].fetchedAt)[0];
+    if (oldest) cache.delete(oldest[0]);
+  }
+  cache.set(key, { data, fetchedAt: Date.now() });
+}
 
 export interface TickerItem {
   name: string;
@@ -28,7 +38,7 @@ async function ninjaFetch(url: string) {
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
-  cache.set(url, { data, fetchedAt: Date.now() });
+  cacheSet(url, data);
   return data;
 }
 
@@ -51,7 +61,7 @@ async function findActiveLeague(): Promise<string> {
   for (let i = 0; i < LEAGUES.length; i++) {
     if (results[i].status === "fulfilled") {
       const league = (results[i] as PromiseFulfilledResult<string>).value;
-      cache.set(cacheKey, { data: league, fetchedAt: Date.now() });
+      cacheSet(cacheKey, league);
       return league;
     }
   }
@@ -68,60 +78,26 @@ function topN(items: TickerItem[], n = 50): TickerItem[] {
   return dedup(items.sort((a, b) => b.chaosValue - a.chaosValue)).slice(0, n);
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const section = searchParams.get("section") || "all";
+const BELT_BASE_TYPES = ["Belt", "Sash", "Buckle", "Cord", "Strap", "Band",
+  "Leather Belt", "Heavy Belt", "Rustic Sash", "Studded Belt", "Chain Belt", "Cloth Belt", "Crystal Belt"];
 
-  try {
-    const league = await findActiveLeague();
-    const enc = encodeURIComponent(league);
+function parseCurrencies(raw: { lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> }): TickerItem[] {
+  const iconMap = new Map((raw.currencyDetails ?? []).map(c => [c.name, c.icon]));
+  return topN(
+    (raw.lines ?? [])
+      .filter(l => (l.chaosEquivalent ?? 0) >= 1)
+      .map(l => ({
+        name: l.currencyTypeName!,
+        chaosValue: Math.round((l.chaosEquivalent ?? 0) * 10) / 10,
+        icon: iconMap.get(l.currencyTypeName!) ?? null,
+        category: "currency" as const,
+      }))
+  );
+}
 
-    // ── 모든 카테고리 병렬 fetch ──────────────────────────────────────
-    const [
-      currencyRaw,
-      fragmentRaw,
-      scarabRaw,
-      gemRaw,
-      ...uniqueRaws
-    ] = await Promise.all([
-      ninjaFetch(`https://poe.ninja/api/data/currencyoverview?league=${enc}&type=Currency`)
-        .catch(() => ({ lines: [], currencyDetails: [] })),
-      ninjaFetch(`https://poe.ninja/api/data/currencyoverview?league=${enc}&type=Fragment`)
-        .catch(() => ({ lines: [], currencyDetails: [] })),
-      ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=Scarab`)
-        .catch(() => ({ lines: [] })),
-      ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=SkillGem`)
-        .catch(() => ({ lines: [] })),
-      ...UNIQUE_TYPES.map(type =>
-        ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=${type}`)
-          .catch(() => ({ lines: [] }))
-      ),
-    ]) as [
-      { lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> },
-      { lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> },
-      { lines: Array<NinjaLine> },
-      { lines: Array<NinjaLine> },
-      ...Array<{ lines: Array<NinjaLine> }>
-    ];
-
-    // ── 화폐 ─────────────────────────────────────────────────────────
-    const iconMap = new Map((currencyRaw.currencyDetails ?? []).map(c => [c.name, c.icon]));
-
-    const currencies: TickerItem[] = topN(
-      (currencyRaw.lines ?? [])
-        .filter(l => (l.chaosEquivalent ?? 0) >= 1)
-        .map(l => ({
-          name: l.currencyTypeName!,
-          chaosValue: Math.round((l.chaosEquivalent ?? 0) * 10) / 10,
-          icon: iconMap.get(l.currencyTypeName!) ?? null,
-          category: "currency" as const,
-        }))
-    );
-
-    if (section === "currency") return NextResponse.json({ league, items: currencies });
-
-    // ── 고유 아이템 ───────────────────────────────────────────────────
-    const allUniques: TickerItem[] = uniqueRaws.flatMap(d =>
+function parseUniques(raws: Array<{ lines: Array<NinjaLine> }>): TickerItem[] {
+  return topN(
+    raws.flatMap(d =>
       (d.lines ?? [])
         .filter((l: NinjaLine) => (l.chaosValue ?? 0) > 0)
         .map((l: NinjaLine) => ({
@@ -131,64 +107,73 @@ export async function GET(req: NextRequest) {
           category: "unique" as const,
           baseType: l.baseType,
         }))
-    );
-    const uniqueItems = topN(allUniques);
+    )
+  );
+}
 
-    if (section === "unique") return NextResponse.json({ league, items: uniqueItems });
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const section = searchParams.get("section") || "ticker";
 
-    // ── 갑충석 ───────────────────────────────────────────────────────
-    const scarabs: TickerItem[] = topN(
-      (scarabRaw.lines ?? [])
-        .filter((l: NinjaLine) => (l.chaosValue ?? 0) > 0)
-        .map((l: NinjaLine) => ({
-          name: l.name!,
-          chaosValue: Math.round(l.chaosValue ?? 0),
-          icon: l.icon ?? null,
-          category: "scarab" as const,
-          baseType: l.baseType,
-        }))
-    );
+  try {
+    const league = await findActiveLeague();
+    const enc = encodeURIComponent(league);
 
-    if (section === "scarab") return NextResponse.json({ league, items: scarabs });
+    // ── currency ─────────────────────────────────────────────────────
+    if (section === "currency") {
+      const raw = await ninjaFetch(`https://poe.ninja/api/data/currencyoverview?league=${enc}&type=Currency`)
+        .catch(() => ({ lines: [], currencyDetails: [] })) as { lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> };
+      return NextResponse.json({ league, items: parseCurrencies(raw) });
+    }
 
-    // ── 리그 아이템 (Fragment) ─────────────────────────────────────────
-    const fIconMap = new Map((fragmentRaw.currencyDetails ?? []).map(c => [c.name, c.icon]));
-    const leagueItems: TickerItem[] = topN(
-      (fragmentRaw.lines ?? [])
-        .filter((l: NinjaLine) => (l.chaosEquivalent ?? 0) >= 1)
-        .map((l: NinjaLine) => ({
-          name: l.currencyTypeName!,
-          chaosValue: Math.round((l.chaosEquivalent ?? 0) * 10) / 10,
-          icon: fIconMap.get(l.currencyTypeName!) ?? null,
-          category: "league" as const,
-        }))
-    );
+    // ── scarab ────────────────────────────────────────────────────────
+    if (section === "scarab") {
+      const raw = await ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=Scarab`)
+        .catch(() => ({ lines: [] })) as { lines: Array<NinjaLine> };
+      return NextResponse.json({ league, items: topN((raw.lines ?? []).filter(l => (l.chaosValue ?? 0) > 0).map(l => ({ name: l.name!, chaosValue: Math.round(l.chaosValue ?? 0), icon: l.icon ?? null, category: "scarab" as const, baseType: l.baseType }))) });
+    }
 
-    if (section === "league") return NextResponse.json({ league, items: leagueItems });
+    // ── gem ───────────────────────────────────────────────────────────
+    if (section === "gem") {
+      const raw = await ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=SkillGem`)
+        .catch(() => ({ lines: [] })) as { lines: Array<NinjaLine> };
+      return NextResponse.json({ league, items: topN((raw.lines ?? []).filter(l => (l.chaosValue ?? 0) > 0).map(l => ({ name: l.name!, chaosValue: Math.round(l.chaosValue ?? 0), icon: l.icon ?? null, category: "gem" as const, baseType: l.baseType }))) });
+    }
 
-    // ── 스킬 젬 ───────────────────────────────────────────────────────
-    const skillGems: TickerItem[] = topN(
-      (gemRaw.lines ?? [])
-        .filter((l: NinjaLine) => (l.chaosValue ?? 0) > 0)
-        .map((l: NinjaLine) => ({
-          name: l.name!,
-          chaosValue: Math.round(l.chaosValue ?? 0),
-          icon: l.icon ?? null,
-          category: "gem" as const,
-          baseType: l.baseType,
-        }))
-    );
+    // ── league (fragment) ─────────────────────────────────────────────
+    if (section === "league") {
+      const raw = await ninjaFetch(`https://poe.ninja/api/data/currencyoverview?league=${enc}&type=Fragment`)
+        .catch(() => ({ lines: [], currencyDetails: [] })) as { lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> };
+      const fIconMap = new Map((raw.currencyDetails ?? []).map(c => [c.name, c.icon]));
+      return NextResponse.json({ league, items: topN((raw.lines ?? []).filter(l => (l.chaosEquivalent ?? 0) >= 1).map(l => ({ name: l.currencyTypeName!, chaosValue: Math.round((l.chaosEquivalent ?? 0) * 10) / 10, icon: fIconMap.get(l.currencyTypeName!) ?? null, category: "league" as const }))) });
+    }
 
-    if (section === "gem") return NextResponse.json({ league, items: skillGems });
+    // ── unique ────────────────────────────────────────────────────────
+    if (section === "unique") {
+      const uniqueRaws = await Promise.all(
+        UNIQUE_TYPES.map(type =>
+          ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=${type}`)
+            .catch(() => ({ lines: [] }))
+        )
+      ) as Array<{ lines: Array<NinjaLine> }>;
+      return NextResponse.json({ league, items: parseUniques(uniqueRaws) });
+    }
 
-    // ── 티커용 벨트 (기존 호환) ───────────────────────────────────────
-    const BELT_BASE_TYPES = ["Belt", "Sash", "Buckle", "Cord", "Strap", "Band",
-      "Leather Belt", "Heavy Belt", "Rustic Sash", "Studded Belt", "Chain Belt", "Cloth Belt", "Crystal Belt"];
-    const belts: TickerItem[] = topN(
-      allUniques.filter(l => BELT_BASE_TYPES.some(b => l.baseType?.includes(b)))
-    );
+    // ── ticker (기본값) — currency 1개 + unique 5개 = 6개 요청 ─────────
+    const [currencyRaw, ...uniqueRaws] = await Promise.all([
+      ninjaFetch(`https://poe.ninja/api/data/currencyoverview?league=${enc}&type=Currency`)
+        .catch(() => ({ lines: [], currencyDetails: [] })),
+      ...UNIQUE_TYPES.map(type =>
+        ninjaFetch(`https://poe.ninja/api/data/itemoverview?league=${enc}&type=${type}`)
+          .catch(() => ({ lines: [] }))
+      ),
+    ]) as [{ lines: Array<NinjaLine>; currencyDetails: Array<{ name: string; icon: string }> }, ...Array<{ lines: Array<NinjaLine> }>];
 
-    return NextResponse.json({ league, currencies, belts, top10: uniqueItems.slice(0, 10), uniqueItems, scarabs, leagueItems, skillGems });
+    const currencies = parseCurrencies(currencyRaw);
+    const allUniques = parseUniques(uniqueRaws);
+    const belts = topN(allUniques.filter(l => BELT_BASE_TYPES.some(b => l.baseType?.includes(b))));
+
+    return NextResponse.json({ league, currencies, belts, top10: allUniques.slice(0, 10) });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "데이터 로드 실패" },

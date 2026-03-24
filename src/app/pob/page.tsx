@@ -20,7 +20,10 @@ export default function PobPage() {
     try {
       if (activeTab === "pob") {
         if (!pobCode.trim()) { setError("PoB 코드를 입력해주세요."); return; }
-        router.push(`/build?code=${encodeURIComponent(pobCode.trim())}&source=pob`);
+        // URL에 직접 넣으면 nginx 버퍼(8k) 초과로 ERR_CONNECTION_CLOSED 발생
+        // sessionStorage에 저장 후 이동
+        sessionStorage.setItem("pobCode", pobCode.trim());
+        router.push("/build?source=pob");
       } else {
         if (!ninjaUrl.trim()) { setError("poe.ninja URL을 입력해주세요."); return; }
         router.push(`/build?url=${encodeURIComponent(ninjaUrl.trim())}&source=ninja`);

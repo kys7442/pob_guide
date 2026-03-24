@@ -24,7 +24,7 @@ function BuildPageContent() {
   const [activeTab, setActiveTab] = useState<TabId>("skills");
 
   const source = searchParams.get("source");
-  const code = searchParams.get("code");
+  const urlCode = searchParams.get("code"); // 하위호환: 구버전 URL 직접 접근 지원
   const url = searchParams.get("url");
 
   useEffect(() => {
@@ -40,7 +40,11 @@ function BuildPageContent() {
       try {
         let res: Response;
 
-        if (source === "pob" && code) {
+        if (source === "pob") {
+          // sessionStorage 우선, 없으면 URL 파라미터 fallback (하위호환)
+          const code = sessionStorage.getItem("pobCode") || urlCode;
+          sessionStorage.removeItem("pobCode"); // 사용 후 제거
+          if (!code) { router.replace("/"); return; }
           res = await fetch("/api/parse-pob", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -69,7 +73,7 @@ function BuildPageContent() {
     }
 
     fetchBuild();
-  }, [source, code, url, router]);
+  }, [source, urlCode, url, router]);
 
   if (loading) {
     return <LoadingSpinner message="빌드를 분석하고 있습니다..." />;
@@ -105,7 +109,7 @@ function BuildPageContent() {
     <div className="space-y-4">
       {/* 뒤로 가기 */}
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/pob")}
         className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-300 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> 새 빌드 분석
@@ -140,7 +144,7 @@ function BuildPageContent() {
         <div className="p-4">
           {activeTab === "skills" && <SkillGems build={build} />}
           {activeTab === "items" && <ItemDisplay build={build} />}
-          {activeTab === "passives" && <PassiveSummary build={build} pobCode={code || undefined} />}
+          {activeTab === "passives" && <PassiveSummary build={build} pobCode={urlCode || undefined} />}
         </div>
       </div>
 

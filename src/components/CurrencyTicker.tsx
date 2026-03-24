@@ -84,7 +84,7 @@ export default function CurrencyTicker() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/currency-rates")
+    fetch("/api/currency-rates?section=ticker")
       .then(r => r.json())
       .then((d: TickerData) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));

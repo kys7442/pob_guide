@@ -52,12 +52,6 @@ export default function RootLayout({
               </div>
             </div>
           </header>
-          {/* 공지 배너 */}
-          <div className="bg-amber-950/60 border-b border-amber-800/40 text-center py-1.5 px-4">
-            {/* <p className="text-xs text-amber-300/80">
-              ⚠️ 이 사이트는 계속 보완 중이며, 특히 한글화가 안 된 경우 <strong className="text-amber-200">영문명으로 검색</strong>하셔야 합니다.
-            </p> */}
-          </div>
           <main className="w-full max-w-6xl mx-auto px-4 py-8">{children}</main>
           <footer className="border-t border-gray-800 mt-16 py-8 text-center text-xs text-gray-600 space-y-1.5">
             <p className="text-gray-400 font-medium">

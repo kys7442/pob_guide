@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import SeasonSelector from "@/components/SeasonSelector";
-import AdSense from "@/components/AdSense";
 import SpeculationRules from "@/components/SpeculationRules";
 import BfcacheOptimizer from "@/components/BfcacheOptimizer";
 
@@ -55,32 +54,11 @@ export default function RootLayout({
           </header>
           {/* 공지 배너 */}
           <div className="bg-amber-950/60 border-b border-amber-800/40 text-center py-1.5 px-4">
-            <p className="text-xs text-amber-300/80">
+            {/* <p className="text-xs text-amber-300/80">
               ⚠️ 이 사이트는 계속 보완 중이며, 특히 한글화가 안 된 경우 <strong className="text-amber-200">영문명으로 검색</strong>하셔야 합니다.
-            </p>
+            </p> */}
           </div>
-          {/* 3-column: 좌측광고 | 콘텐츠 | 우측광고 */}
-          <div className="flex justify-center items-start gap-0">
-            {/* 좌측 광고 — 1440px 이상에서만 표시 */}
-            <aside className="hidden 2xl:flex flex-col items-center pt-8 w-[160px] shrink-0 sticky top-[57px] self-start">
-              <AdSense
-                adSlot="YOUR_LEFT_AD_SLOT_ID"
-                adFormat="vertical"
-                style={{ width: 160, height: 600 }}
-              />
-            </aside>
-
-            <main className="w-full max-w-6xl px-4 py-8 min-w-0">{children}</main>
-
-            {/* 우측 광고 — 1440px 이상에서만 표시 */}
-            <aside className="hidden 2xl:flex flex-col items-center pt-8 w-[160px] shrink-0 sticky top-[57px] self-start">
-              <AdSense
-                adSlot="YOUR_RIGHT_AD_SLOT_ID"
-                adFormat="vertical"
-                style={{ width: 160, height: 600 }}
-              />
-            </aside>
-          </div>
+          <main className="w-full max-w-6xl mx-auto px-4 py-8">{children}</main>
           <footer className="border-t border-gray-800 mt-16 py-8 text-center text-xs text-gray-600 space-y-1.5">
             <p className="text-gray-400 font-medium">
               © 2026 <a href="mailto:kys7442@naver.com" className="text-amber-500 hover:text-amber-400 transition-colors">kys7442@naver.com</a>. All rights reserved.

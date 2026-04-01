@@ -112,6 +112,9 @@ export default function RootLayout({
                 <a href="/ninja" className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 transition-colors whitespace-nowrap">
                   빌드 순위
                 </a>
+                <a href="/guides" className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 transition-colors whitespace-nowrap hidden sm:inline-block">
+                  가이드
+                </a>
                 <a href="/about" className="px-3 py-1.5 rounded-lg text-sm text-gray-400 hover:text-amber-400 hover:bg-gray-800 transition-colors whitespace-nowrap hidden sm:inline-block">
                   소개
                 </a>
@@ -126,6 +129,7 @@ export default function RootLayout({
             {/* 푸터 내비게이션 */}
             <nav className="flex justify-center gap-4 text-gray-500">
               <a href="/about" className="hover:text-amber-400 transition-colors">소개</a>
+              <a href="/guides" className="hover:text-amber-400 transition-colors">가이드</a>
               <a href="/privacy" className="hover:text-amber-400 transition-colors">개인정보처리방침</a>
               <a href="/terms" className="hover:text-amber-400 transition-colors">이용약관</a>
               <a href="mailto:kys7442@naver.com" className="hover:text-amber-400 transition-colors">문의</a>

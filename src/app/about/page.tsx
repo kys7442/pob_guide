@@ -108,6 +108,36 @@ export default function AboutPage() {
           </ul>
         </section>
 
+        {/* 왜 만들었나 */}
+        <section className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+          <h2 className="text-lg font-bold text-white mb-3">왜 만들었나요?</h2>
+          <p className="text-sm text-gray-300 leading-relaxed mb-3">
+            Path of Exile은 빌드의 자유도가 높은 만큼, 정보의 양도 방대합니다.
+            영어로 된 빌드 가이드와 분석 도구는 많지만, 한국어 사용자를 위한
+            통합 도구는 부족했습니다.
+          </p>
+          <p className="text-sm text-gray-300 leading-relaxed">
+            이 사이트는 PoB 코드 분석, 실시간 시세, 빌드 순위, AI 해설까지
+            한국어 PoE 유저가 필요로 하는 핵심 정보를 한곳에서 제공하기 위해
+            만들어졌습니다. 초보자도 쉽게 빌드를 이해하고, 숙련자도 빠르게
+            정보를 확인할 수 있는 것이 목표입니다.
+          </p>
+        </section>
+
+        {/* 만든 사람 */}
+        <section className="bg-gray-900 border border-gray-700 rounded-xl p-6">
+          <h2 className="text-lg font-bold text-white mb-3">만든 사람</h2>
+          <p className="text-sm text-gray-300 leading-relaxed mb-3">
+            PoE 빌드 가이드는 Path of Exile을 오랫동안 즐겨온 한국인 개발자가
+            운영하는 개인 팬 프로젝트입니다. 매 리그마다 빌드를 분석하고 시세를
+            확인하면서 쌓은 경험을 바탕으로, 한국어 사용자에게 실질적으로
+            도움이 되는 도구를 만들고자 합니다.
+          </p>
+          <p className="text-sm text-gray-400">
+            사이트 개선 아이디어나 오류 제보는 언제든 환영합니다.
+          </p>
+        </section>
+
         {/* 연락처 */}
         <section className="bg-gray-900 border border-gray-700 rounded-xl p-6">
           <h2 className="text-lg font-bold text-white mb-3">문의</h2>
